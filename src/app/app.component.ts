@@ -7,6 +7,35 @@ import { Socket } from 'ngx-socket-io';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+	usersList = [
+		'staplingcircumpolar',
+		'downmanual',
+		'trashadmissions',
+		'unlockinghoop',
+		'atticwinnings',
+		'glidematerial',
+		'baboonascend',
+		'torchcasino',
+		'fonticonsfaith',
+		'heliumjulian',
+		'mortifyfavourite',
+		'dilationmuzzle',
+		'spiritualicing',
+		'peeppolio',
+		'decimalouachita',
+		'dishsailor',
+		'septumwife',
+		'scadderabandoned',
+		'marionfriday',
+		'untaggedcake',
+		'fiddlesydney',
+		'digbywing',
+		'inversescolding',
+		'amusermotorcycle',
+		'dramatizeunkempt',
+		'esteemedpenny',
+		'rustyduckling'
+	];
 	title = 'm4d-chat-client';
 	toSendMessage = '';
 	toSendImage = '';
@@ -15,27 +44,41 @@ export class AppComponent implements OnInit {
 	constructor(private socket: Socket) { }
 
 	onSendMessage() {
-		this.socket.emit('messageFromClientToServer', this.toSendMessage);
-		this.messages.push({body: this.toSendMessage, admin: false, date: new Date().toDateString()});
+		this.socket.emit('messageFromClientToServer', {text: this.toSendMessage, username: this.username});
+		this.messages.push({ body: this.toSendMessage, admin: false, date: new Date().toDateString() });
 		console.log(this.toSendMessage);
 		this.toSendMessage = '';
 	}
 
 	onFileChanged(event: any) {
-		let img = URL.createObjectURL(event.target.files[0]);
+		const img = URL.createObjectURL(event.target.files[0]);
 		console.log(event);
 	}
 
 	ngOnInit(): void {
-		this.username = prompt('[Test] enter username', 'No username');
-		this.socket.emit('messageInitFromClient', this.username); //! TODO: error handling
+		this.username = this.getUsername();
+		this.socket.emit('messageInitFromClient', this.username); // ! TODO: error handling
 
 		this.socket.on('messageFromServerToClient', (response) => {
 			console.log(response);
 		});
 
 		this.socket.on('messageFromMainClientToClient', (response) => {
-			this.messages.push({body: response.body, admin: true, date: new Date().toDateString()});
+			this.messages.push({ body: response.body, admin: true, date: new Date().toDateString() });
 		});
+	}
+	public getUsername(): string{
+		let usernameindex = localStorage.getItem('usernameIndexCount');
+		if (usernameindex) {
+			usernameindex = (parseInt(usernameindex)+1) + '';
+			if (parseInt(usernameindex) === this.usersList.length) {
+				usernameindex = '0';
+			}
+			localStorage.setItem('usernameIndexCount', usernameindex);
+		} else {
+			localStorage.setItem('usernameIndexCount', '0');
+		}
+
+		return this.usersList[parseInt(usernameindex)];
 	}
 }

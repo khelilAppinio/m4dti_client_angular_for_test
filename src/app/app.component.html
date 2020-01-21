@@ -1,4 +1,4 @@
-<h1>{{username}}</h1>
+<h1>username: {{username}}</h1>
 <div *ngFor="let message of messages">
 	<h3 [ngStyle]="{'color': message.admin ? 'red' : 'gray'}">{{message.body}}</h3>
 	<h4>{{message.date}}</h4>
