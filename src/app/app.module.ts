@@ -7,6 +7,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 const config: SocketIoConfig = { url: 'http://localhost:4444', options: {} };
 
+import { HttpClientModule } from '@angular/common/http';
+
+
 @NgModule({
 	declarations: [
 		AppComponent
@@ -17,6 +20,7 @@ const config: SocketIoConfig = { url: 'http://localhost:4444', options: {} };
 
 		FormsModule,
 		ReactiveFormsModule,
+		HttpClientModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

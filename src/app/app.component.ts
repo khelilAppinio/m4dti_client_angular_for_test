@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
 	selector: 'app-root',
@@ -41,18 +42,16 @@ export class AppComponent implements OnInit {
 	toSendImage = '';
 	username: string;
 	messages: { body: string, admin: boolean, date: string }[] = [];
-	constructor(private socket: Socket) { }
+
+	selectedFile: File;
+	base64: string | ArrayBuffer;
+	constructor(private socket: Socket, private http: HttpClient) { }
 
 	onSendMessage() {
-		this.socket.emit('messageFromClientToServer', {text: this.toSendMessage, username: this.username});
+		this.socket.emit('messageFromClientToServer', { text: this.toSendMessage, username: this.username });
 		this.messages.push({ body: this.toSendMessage, admin: false, date: new Date().toDateString() });
 		console.log(this.toSendMessage);
 		this.toSendMessage = '';
-	}
-
-	onFileChanged(event: any) {
-		const img = URL.createObjectURL(event.target.files[0]);
-		console.log(event);
 	}
 
 	ngOnInit(): void {
@@ -67,10 +66,10 @@ export class AppComponent implements OnInit {
 			this.messages.push({ body: response.body, admin: true, date: new Date().toDateString() });
 		});
 	}
-	public getUsername(): string{
+	public getUsername(): string {
 		let usernameindex = localStorage.getItem('usernameIndexCount');
 		if (usernameindex) {
-			usernameindex = (parseInt(usernameindex)+1) + '';
+			usernameindex = (parseInt(usernameindex) + 1) + '';
 			if (parseInt(usernameindex) === this.usersList.length) {
 				usernameindex = '0';
 			}
@@ -80,5 +79,25 @@ export class AppComponent implements OnInit {
 		}
 
 		return this.usersList[parseInt(usernameindex)];
+	}
+
+	async onFileChanged(event) {
+		this.selectedFile = event.target.files[0];
+		const reader = new FileReader();
+		reader.readAsDataURL(this.selectedFile);
+		reader.onload = () => this.base64 = reader.result;
+		reader.onerror = error => console.error(error);
+
+	}
+
+	onSendImage() {
+		console.log(this.socket);
+		this.http.post('http://localhost:3000/image-upload', {
+			data: this.base64,
+			username: this.username,
+			sourceSocketId: this.socket.ioSocket.id
+			}).subscribe((response) => {
+			console.log(response);
+		}, err => console.log(err));
 	}
 }
