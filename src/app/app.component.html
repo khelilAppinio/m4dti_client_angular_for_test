@@ -8,4 +8,7 @@
 <div>
 	<input type="file" (change)="onFileChanged($event)">
 	<button (click)="onSendImage()">send</button>
+	<input type="file"  capture (change)="onAudioChanged($event)">
+	<button (click)="onSendAudio()">send</button>
+
 </div>
