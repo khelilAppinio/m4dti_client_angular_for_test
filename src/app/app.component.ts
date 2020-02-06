@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
 		'dramatizeunkempt',
 		'esteemedpenny',
 		'rustyduckling'
-	];
+	].slice(0,7);
 	title = 'm4d-chat-client';
 	toSendMessage = '';
 	toSendImage = '';
@@ -89,10 +89,31 @@ export class AppComponent implements OnInit {
 		reader.onerror = error => console.error(error);
 
 	}
+async onAudioChanged(event) {
+		this.selectedFile = event.target.files[0];
+		const reader = new FileReader();
+		reader.readAsDataURL(this.selectedFile);
+		reader.onload = () => {
+			this.base64 = reader.result;
+			console.log(this.base64);
+			
+			};
+		reader.onerror = error => console.error(error);
 
+	}
 	onSendImage() {
 		console.log(this.socket);
 		this.http.post('http://localhost:3000/image-upload', {
+			data: this.base64,
+			username: this.username,
+			sourceSocketId: this.socket.ioSocket.id
+			}).subscribe((response) => {
+			console.log(response);
+		}, err => console.log(err));
+	}
+	onSendAudio() {
+		console.log(this.socket);
+		this.http.post('http://localhost:3000/audio-upload', {
 			data: this.base64,
 			username: this.username,
 			sourceSocketId: this.socket.ioSocket.id
